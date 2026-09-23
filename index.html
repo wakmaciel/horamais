@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
   <title>Hora+</title>
   <meta name="description" content="Calculadora de horas extras para PJ e CLT">
-  <meta name="theme-color" content="#12061f">
+  <meta name="theme-color" content="#fbf4f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#2b2430" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,6 +16,13 @@
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    // aplica o tema salvo antes de desenhar a tela (evita piscar)
+    try {
+      var t = (JSON.parse(localStorage.getItem('horaplus:v1')) || {}).theme;
+      if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
 </head>
 <body>
   <!-- Fundo animado (o "líquido" atrás do vidro) -->
@@ -232,6 +240,15 @@
         </div>
         <p class="help">CLT art. 59 e CF art. 7º XVI: mínimo de 50% sobre a hora normal. Domingos e feriados trabalhados sem folga compensatória: 100% (Súmula 146 TST). DSR sobre horas extras: Lei 605/49 e Súmula 172 TST. Descontos pela tabela INSS e IRRF 2026 (Lei 15.270/2025). Se sua convenção coletiva prevê percentuais maiores, ajuste acima.</p>
       </div>
+
+      <div class="group-title">Aparência</div>
+      <div class="glass segmented three" id="themeSeg" role="tablist">
+        <span class="seg-thumb"></span>
+        <button type="button" role="tab" data-value="auto">Automático</button>
+        <button type="button" role="tab" data-value="light">Claro</button>
+        <button type="button" role="tab" data-value="dark">Escuro</button>
+      </div>
+      <p class="help">Automático segue o modo claro/escuro do iPhone.</p>
 
       <div class="group-title">Dados</div>
       <div class="glass card form">

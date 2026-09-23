@@ -50,7 +50,7 @@ const DEFAULT_CFG = {
   deps: 0,
   dsr: true,
 };
-const DEFAULTS = { ...DEFAULT_CFG, months: {} }; // months: { 'YYYY-MM': { h1, h2, cfg } }
+const DEFAULTS = { ...DEFAULT_CFG, theme: 'auto', months: {} }; // months: { 'YYYY-MM': { h1, h2, cfg } }
 
 const MONTHS_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
@@ -103,6 +103,12 @@ function setCfg(patch) {
   const rec = state.months[monthKey()];
   if (rec) rec.cfg = { ...rec.cfg, ...patch };
   save();
+}
+
+function applyTheme() {
+  const t = state.theme;
+  if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  else delete document.documentElement.dataset.theme;
 }
 
 /* ---------------- Utilidades ---------------- */
@@ -413,6 +419,9 @@ function renderSettings() {
     ? `Alterações valem para ${monthName(cursor.y, cursor.m)}/${cursor.y} e para os próximos meses que você lançar. Meses anteriores mantêm os valores da época.`
     : 'Alterações valem para os próximos meses que você lançar. Meses já lançados mantêm os valores da época.';
 
+  $('#themeSeg').dataset.value = state.theme || 'auto';
+  $$('#themeSeg button').forEach((b) => b.classList.toggle('on', b.dataset.value === (state.theme || 'auto')));
+
   const seg = $('#regimeSeg');
   seg.dataset.value = s.regime;
   $$('#regimeSeg button').forEach((b) => b.classList.toggle('on', b.dataset.value === s.regime));
@@ -603,6 +612,12 @@ function bind() {
     setCfg(patch); render();
   }));
 
+  // Tema
+  $$('#themeSeg button').forEach((b) => b.addEventListener('click', () => {
+    state.theme = b.dataset.value;
+    save(); applyTheme(); renderSettings();
+  }));
+
   // Escalas
   $('#scales').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-scale]');
@@ -673,6 +688,7 @@ function bind() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       state = load();
       save();
+      applyTheme();
       render();
       toast('Backup restaurado');
     } catch {
@@ -684,6 +700,7 @@ function bind() {
     if (!confirm('Apagar salário, escala e todo o histórico salvo neste aparelho?')) return;
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* nada */ }
     state = { ...DEFAULTS, months: {} };
+    applyTheme();
     render();
     toast('Dados apagados');
   });
@@ -702,6 +719,7 @@ function greet() {
 }
 
 /* ---------------- Init ---------------- */
+applyTheme();
 greet();
 bind();
 goTo(cfg().salary > 0 ? 'calc' : 'settings');
