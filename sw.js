@@ -1,5 +1,5 @@
 // Troque a versão a cada deploy para forçar atualização no celular
-const CACHE = 'horaplus-v4';
+const CACHE = 'horaplus-v5';
 const ASSETS = [
   './',
   './index.html',
