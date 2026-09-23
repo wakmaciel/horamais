@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <title>Hora+</title>
+  <meta name="description" content="Calculadora de horas extras para PJ e CLT">
+  <meta name="theme-color" content="#12061f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hora+">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Fundo animado (o "líquido" atrás do vidro) -->
+  <div class="backdrop" aria-hidden="true">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+    <span class="blob b4"></span>
+  </div>
+
+  <main class="app">
+    <!-- ================= CALCULAR ================= -->
+    <section class="view active" id="view-calc">
+      <header class="top">
+        <div>
+          <p class="eyebrow" id="greeting">Horas extras</p>
+          <h1>Hora<span class="plus">+</span></h1>
+        </div>
+        <button class="glass pill regime-pill" id="regimePill" type="button" aria-label="Alterar regime">
+          <span class="dot"></span><span id="regimePillText">PJ</span>
+        </button>
+      </header>
+
+      <div class="glass month">
+        <button class="icon-btn" id="prevMonth" type="button" aria-label="Mês anterior">
+          <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="month-label">
+          <span class="caption">Mês de referência</span>
+          <strong id="monthLabel">—</strong>
+        </div>
+        <button class="icon-btn" id="nextMonth" type="button" aria-label="Próximo mês">
+          <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- Aviso quando ainda não configurou salário -->
+      <div class="glass card setup-hint" id="setupHint" hidden>
+        <p><strong>Vamos começar?</strong><br>Informe seu salário e escala de trabalho.</p>
+        <button class="btn primary" type="button" data-goto="settings">Configurar</button>
+      </div>
+
+      <div class="glass card stats">
+        <div class="stat">
+          <span class="caption">Salário</span>
+          <strong id="statSalary">R$ 0,00</strong>
+        </div>
+        <div class="stat">
+          <span class="caption">Horas/mês</span>
+          <strong id="statHours">0h</strong>
+        </div>
+        <div class="stat accent">
+          <span class="caption">Valor hora</span>
+          <strong id="statRate">R$ 0,00</strong>
+        </div>
+      </div>
+
+      <!-- Entradas de horas -->
+      <div class="glass card inputs">
+        <div class="hours-field" data-field="h1">
+          <label for="h1"><span id="h1Label">Horas extras realizadas</span> <em id="h1Hint"></em></label>
+          <div class="stepper">
+            <button type="button" class="step" data-step="-30" aria-label="Menos 30 minutos">−</button>
+            <input id="h1" class="time-input" type="text" inputmode="numeric" autocomplete="off" placeholder="00:00" value="00:00">
+            <button type="button" class="step" data-step="30" aria-label="Mais 30 minutos">+</button>
+          </div>
+        </div>
+        <div class="hours-field clt-only" data-field="h2">
+          <label for="h2"><span>Domingos e feriados</span> <em id="h2Hint"></em></label>
+          <div class="stepper">
+            <button type="button" class="step" data-step="-30" aria-label="Menos 30 minutos">−</button>
+            <input id="h2" class="time-input" type="text" inputmode="numeric" autocomplete="off" placeholder="00:00" value="00:00">
+            <button type="button" class="step" data-step="30" aria-label="Mais 30 minutos">+</button>
+          </div>
+        </div>
+        <p class="tip">Digite no formato <b>hh:mm</b> — ex.: 1230 vira 12:30</p>
+      </div>
+
+      <!-- Resultado -->
+      <div class="glass card result" id="result">
+        <span class="caption" id="heroCaption">Valor da Nota Fiscal</span>
+        <div class="hero" id="heroValue">R$ 0,00</div>
+        <p class="hero-sub" id="heroSub">Salário + horas extras</p>
+        <ul class="lines" id="lines"></ul>
+        <button class="btn primary copy" id="copyBtn" type="button">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>
+          <span id="copyText">Copiar valor da NF</span>
+        </button>
+      </div>
+
+      <p class="footnote" id="footnote"></p>
+    </section>
+
+    <!-- ================= AJUSTES ================= -->
+    <section class="view" id="view-settings">
+      <header class="top">
+        <div>
+          <p class="eyebrow">Configuração</p>
+          <h1>Ajustes</h1>
+        </div>
+      </header>
+
+      <div class="group-title">Regime de contratação</div>
+      <div class="glass segmented" id="regimeSeg" role="tablist">
+        <span class="seg-thumb"></span>
+        <button type="button" role="tab" data-value="PJ">PJ</button>
+        <button type="button" role="tab" data-value="CLT">CLT</button>
+      </div>
+      <p class="help" id="regimeHelp"></p>
+
+      <div class="group-title">Remuneração</div>
+      <div class="glass card form">
+        <label class="row">
+          <span>Salário mensal</span>
+          <input id="salary" class="money-input" type="text" inputmode="numeric" autocomplete="off" placeholder="R$ 0,00">
+        </label>
+      </div>
+
+      <div class="group-title">Escala de trabalho</div>
+      <div class="scales" id="scales"></div>
+      <div class="glass card form">
+        <label class="row">
+          <span>Horas mensais <small>(divisor)</small></span>
+          <input id="divisor" class="num-input" type="text" inputmode="decimal" autocomplete="off">
+        </label>
+      </div>
+      <p class="help" id="divisorHelp"></p>
+
+      <!-- PJ -->
+      <div class="pj-only">
+        <div class="group-title">Hora extra PJ</div>
+        <div class="glass card form">
+          <label class="row">
+            <span>Adicional sobre a hora <small>(%)</small></span>
+            <input id="pjExtra" class="num-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+          </label>
+          <label class="row">
+            <span>Impostos da NF <small>(%, opcional)</small></span>
+            <input id="pjTax" class="num-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+          </label>
+        </div>
+        <p class="help">Adicional = 0% paga a hora extra pelo mesmo valor da hora normal. Os impostos só servem para estimar quanto sobra líquido (ex.: Simples Nacional 6%).</p>
+      </div>
+
+      <!-- CLT -->
+      <div class="clt-only">
+        <div class="group-title">Regras CLT</div>
+        <div class="glass card form">
+          <label class="row">
+            <span>Adicional dias úteis <small>(%)</small></span>
+            <input id="clt50" class="num-input" type="text" inputmode="decimal" autocomplete="off" placeholder="50">
+          </label>
+          <label class="row">
+            <span>Adicional domingos/feriados <small>(%)</small></span>
+            <input id="clt100" class="num-input" type="text" inputmode="decimal" autocomplete="off" placeholder="100">
+          </label>
+          <label class="row">
+            <span>Dependentes <small>(IRRF)</small></span>
+            <input id="deps" class="num-input" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+          </label>
+          <label class="row toggle-row">
+            <span>Reflexo no DSR</span>
+            <input id="dsr" type="checkbox" class="switch" checked>
+          </label>
+        </div>
+        <p class="help">CLT art. 59 e CF art. 7º XVI: mínimo de 50% sobre a hora normal. Domingos e feriados trabalhados sem folga compensatória: 100% (Súmula 146 TST). DSR sobre horas extras: Lei 605/49 e Súmula 172 TST. Descontos pela tabela INSS e IRRF 2026 (Lei 15.270/2025). Se sua convenção coletiva prevê percentuais maiores, ajuste acima.</p>
+      </div>
+
+      <div class="group-title">Dados</div>
+      <div class="glass card form">
+        <button class="row danger" id="resetBtn" type="button">Apagar dados deste aparelho</button>
+      </div>
+      <p class="help center">Hora+ · tudo fica salvo só no seu celular</p>
+    </section>
+  </main>
+
+  <!-- Tab bar flutuante -->
+  <nav class="glass tabbar" id="tabbar">
+    <span class="tab-thumb"></span>
+    <button type="button" class="tab active" data-goto="calc">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+      <span>Calcular</span>
+    </button>
+    <button type="button" class="tab" data-goto="settings">
+      <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+      <span>Ajustes</span>
+    </button>
+  </nav>
+
+  <div class="toast glass" id="toast" role="status"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
