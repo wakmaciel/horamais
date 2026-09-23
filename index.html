@@ -108,14 +108,64 @@
       <p class="footnote" id="footnote"></p>
     </section>
 
+    <!-- ================= HISTÓRICO ================= -->
+    <section class="view" id="view-history">
+      <header class="top">
+        <div>
+          <p class="eyebrow">Horas extras</p>
+          <h1>Histórico</h1>
+        </div>
+      </header>
+
+      <div class="glass month">
+        <button class="icon-btn" id="prevYear" type="button" aria-label="Ano anterior">
+          <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="month-label">
+          <span class="caption">Ano</span>
+          <strong id="yearLabel">—</strong>
+        </div>
+        <button class="icon-btn" id="nextYear" type="button" aria-label="Próximo ano">
+          <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <div class="glass card result">
+        <span class="caption" id="yearCaption">Recebido em horas extras</span>
+        <div class="hero" id="yearHero">R$ 0,00</div>
+        <p class="hero-sub" id="yearSub">Nenhum mês lançado</p>
+        <div class="year-stats">
+          <div class="stat"><span class="caption" id="yearTotalLabel">Total NFs</span><strong id="yearTotal">R$ 0,00</strong></div>
+          <div class="stat"><span class="caption">Horas</span><strong id="yearHours">0h</strong></div>
+          <div class="stat"><span class="caption">Média/mês</span><strong id="yearAvg">R$ 0,00</strong></div>
+        </div>
+      </div>
+
+      <div class="glass card chart-card">
+        <span class="caption">Horas extras por mês (R$)</span>
+        <div class="chart" id="chart" role="img" aria-label="Gráfico de horas extras por mês"></div>
+        <div class="chart-tip glass" id="chartTip" hidden></div>
+      </div>
+
+      <div class="group-title">Meses lançados</div>
+      <div class="glass card month-list" id="monthList"></div>
+
+      <button class="btn ghost glass export" id="exportCsv" type="button">
+        <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+        Exportar planilha (CSV)
+      </button>
+      <p class="help center">Cada mês guarda o salário e a escala usados nele, então aumentos futuros não alteram o histórico.</p>
+    </section>
+
     <!-- ================= AJUSTES ================= -->
     <section class="view" id="view-settings">
       <header class="top">
         <div>
-          <p class="eyebrow">Configuração</p>
+          <p class="eyebrow" id="settingsEyebrow">Configuração</p>
           <h1>Ajustes</h1>
         </div>
       </header>
+      <p class="help scope-note" id="scopeNote"></p>
 
       <div class="group-title">Regime de contratação</div>
       <div class="glass segmented" id="regimeSeg" role="tablist">
@@ -185,9 +235,12 @@
 
       <div class="group-title">Dados</div>
       <div class="glass card form">
+        <button class="row action" id="backupBtn" type="button">Exportar backup</button>
+        <button class="row action" id="restoreBtn" type="button">Restaurar backup</button>
         <button class="row danger" id="resetBtn" type="button">Apagar dados deste aparelho</button>
       </div>
-      <p class="help center">Hora+ · tudo fica salvo só no seu celular</p>
+      <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+      <p class="help">Os dados ficam salvos só neste celular. Exporte um backup de vez em quando pra não perder o histórico se trocar de aparelho.</p>
     </section>
   </main>
 
@@ -197,6 +250,10 @@
     <button type="button" class="tab active" data-goto="calc">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
       <span>Calcular</span>
+    </button>
+    <button type="button" class="tab" data-goto="history">
+      <svg viewBox="0 0 24 24"><path d="M5 20V11M10 20V5M15 20v-7M20 20V9"/></svg>
+      <span>Histórico</span>
     </button>
     <button type="button" class="tab" data-goto="settings">
       <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
